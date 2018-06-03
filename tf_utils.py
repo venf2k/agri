@@ -7,25 +7,24 @@ def load_dataset():
 #
 # load, split & shuffle 40.000 tuples dataset
 #
-  Dataset = h5py.File('data/dataset_full_5000.hdf5', "r")
-  #list(Dataset.keys())
-  X_Dataset_orig = np.array(Dataset["img"][:]) # your 40.000 train set features: shape = (8 x 5.000,100,100,3)
-  Y_Dataset_orig = np.array(Dataset["labels"][:])
-  Y_Dataset_orig = Y_Dataset_orig.reshape((1, Y_Dataset_orig.shape[0]))
-  #Shuffle (X, Y)
-  seed=0
-  np.random.seed(seed)            # To make your "random" minibatches the same as ours
-  m = X_Dataset_orig.shape[0]                  # number of training examples
-  permutation = list(np.random.permutation(m))
-  X_Dataset_shuffled = X_Dataset_orig[permutation, :]
-  Y_Dataset_shuffled = Y_Dataset_orig[:, permutation]
-  X_Dataset_train = X_Dataset_shuffled[:30000,:]
-  Y_Dataset_train = Y_Dataset_shuffled[:,:30000]
-  X_Dataset_test = X_Dataset_shuffled[30000:,:]
-  Y_Dataset_test = Y_Dataset_shuffled[:,30000:]
-  classes = np.array(range(7), int)
-
- return X_Dataset_train, Y_Dataset_train, X_Dataset_test, Y_Dataset_test, classes
+    Dataset = h5py.File('data/dataset_full_5000.hdf5', "r")
+    #list(Dataset.keys())
+    X_Dataset_orig = np.array(Dataset["img"][:]) # your 40.000 train set features: shape = (8 x 5.000,100,100,3)
+    Y_Dataset_orig = np.array(Dataset["labels"][:], int)
+    Y_Dataset_orig = Y_Dataset_orig.reshape((1, Y_Dataset_orig.shape[0]))
+    #Shuffle (X, Y)
+    seed=0
+    np.random.seed(seed)            # To make your "random" minibatches the same as ours
+    m = X_Dataset_orig.shape[0]                  # number of training examples
+    permutation = list(np.random.permutation(m))
+    X_Dataset_shuffled = X_Dataset_orig[permutation, :]
+    Y_Dataset_shuffled = Y_Dataset_orig[:, permutation]
+    X_Dataset_train = X_Dataset_shuffled[:28000,:]
+    Y_Dataset_train = Y_Dataset_shuffled[:,:28000]
+    X_Dataset_test = X_Dataset_shuffled[28000:,:]
+    Y_Dataset_test = Y_Dataset_shuffled[:,28000:]
+    classes = np.array(range(7), int)
+    return X_Dataset_train, Y_Dataset_train, X_Dataset_test, Y_Dataset_test, classes
 
 
 def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
@@ -41,15 +40,17 @@ def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
     Returns:
     mini_batches -- list of synchronous (mini_batch_X, mini_batch_Y)
     """
-    
+        
     m = X.shape[1]                  # number of training examples
     mini_batches = []
     np.random.seed(seed)
     
     # Step 1: Shuffle (X, Y)
-    permutation = list(np.random.permutation(m))
-    shuffled_X = X[:, permutation]
-    shuffled_Y = Y[:, permutation].reshape((Y.shape[0],m))
+    #permutation = list(np.random.permutation(m))
+    #shuffled_X = X[:, permutation]
+    #shuffled_Y = Y[:, permutation].reshape((Y.shape[0],m))
+    shuffled_X = X
+    shuffled_Y = Y.reshape((Y.shape[0],m))
 
     # Step 2: Partition (shuffled_X, shuffled_Y). Minus the end case.
     num_complete_minibatches = math.floor(m/mini_batch_size) # number of mini batches of size mini_batch_size in your partitionning

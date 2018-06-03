@@ -1,31 +1,3 @@
-import math
-import numpy as np
-import h5py
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow.python.framework import ops
-from tf_utils import load_dataset, random_mini_batches, convert_to_one_hot, predict
-
-%matplotlib inline
-np.random.seed(1)
-
-
-# Loading the dataset
-X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
-
-
-# Flatten the training and test images
-X_train_flatten = X_train_orig.reshape(X_train_orig.shape[0], -1).T
-X_test_flatten = X_test_orig.reshape(X_test_orig.shape[0], -1).T
-# Normalize image vectors
-X_train = X_train_flatten / 255.
-X_test = X_test_flatten / 255.
-# Convert training and test labels to one hot matrices
-Y_train = convert_to_one_hot(Y_train_orig, 8)
-Y_test = convert_to_one_hot(Y_test_orig, 8)
-
-
-
 def create_placeholders(n_x, n_y):
     """
     Creates the placeholders for the tensorflow session.
@@ -51,7 +23,7 @@ def create_placeholders(n_x, n_y):
     return X, Y
 
 
-def initialize_parameters(N, N1, N2, N3):
+def initialize_parameters(N = 30000, N1 = 25, N2 = 12, N3 = 8):
     """
     Initializes parameters to build a neural network with tensorflow. The shapes are:
                         W1 : [25, 12288]
@@ -86,6 +58,38 @@ def initialize_parameters(N, N1, N2, N3):
     return parameters
 
 
+def forward_propagation(X, parameters):
+    """
+    Implements the forward propagation for the model: LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SOFTMAX
+    
+    Arguments:
+    X -- input dataset placeholder, of shape (input size, number of examples)
+    parameters -- python dictionary containing your parameters "W1", "b1", "W2", "b2", "W3", "b3"
+                  the shapes are given in initialize_parameters
+
+    Returns:
+    Z3 -- the output of the last LINEAR unit
+    """
+    
+    # Retrieve the parameters from the dictionary "parameters" 
+    W1 = parameters['W1']
+    b1 = parameters['b1']
+    W2 = parameters['W2']
+    b2 = parameters['b2']
+    W3 = parameters['W3']
+    b3 = parameters['b3']
+    
+    ### START CODE HERE ### (approx. 5 lines)              # Numpy Equivalents:
+    Z1 = tf.add(tf.matmul(W1, X), b1)                      # Z1 = np.dot(W1, X) + b1
+    A1 = tf.nn.relu(Z1)                                    # A1 = relu(Z1)
+    Z2 = tf.add(tf.matmul(W2, A1), b2)                     # Z2 = np.dot(W2, a1) + b2
+    A2 = tf.nn.relu(Z2)                                    # A2 = relu(Z2)
+    Z3 = tf.add(tf.matmul(W3, A2), b3)                     # Z3 = np.dot(W3,Z2) + b3
+    ### END CODE HERE ###
+    
+    return Z3
+
+
 def compute_cost(z3, Y):
     """
     Computes the cost
@@ -111,7 +115,7 @@ def compute_cost(z3, Y):
 
 
 def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.0001,
-          num_epochs = 1500, minibatch_size = 32, print_cost = True):
+          num_epochs = 1500, minibatch_size = 35, print_cost = True):
     """
     Implements a three-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
     
@@ -140,7 +144,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.0001,
     X, Y = create_placeholders(n_x, n_y)
 
     # Initialize parameters
-    parameters = initialize_parameters(30.000, 25, 12, 8)
+    parameters = initialize_parameters(30000, 25, 12, 8)
     
     # Forward propagation: Build the forward propagation in the tensorflow graph
     ### START CODE HERE ### (1 line)
@@ -214,3 +218,37 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.0001,
         print ("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test}))
         
         return parameters
+
+################################################################################
+#
+# M A I N
+#
+# DIR = /media/user/_home1/apps/python/DL/Agri
+#
+################################################################################
+
+import math
+import numpy as np
+import h5py
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.python.framework import ops
+from tf_utils import load_dataset, random_mini_batches, convert_to_one_hot, predict
+
+%matplotlib inline
+
+# Loading the dataset
+X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
+
+# Flatten the training and test images
+X_train_flatten = X_train_orig.reshape(X_train_orig.shape[0], -1).T
+X_test_flatten = X_test_orig.reshape(X_test_orig.shape[0], -1).T
+# Normalize image vectors
+X_train = X_train_flatten / 255.
+X_test = X_test_flatten / 255.
+# Convert training and test labels to one hot matrices
+Y_train = convert_to_one_hot(Y_train_orig, 8)
+Y_test = convert_to_one_hot(Y_test_orig, 8)
+
+# Train the DNN
+parameters = model(X_train, Y_train, X_test, Y_test)
