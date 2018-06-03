@@ -1,3 +1,11 @@
+#
+# CONST HARD CODED
+#
+# NUM TRAIN EXAMPLES: 28.000
+# NUM MINI BATCHES: 70
+# PICTURE DIM: 30.000
+#
+
 import h5py
 import numpy as np
 import tensorflow as tf
@@ -27,7 +35,7 @@ def load_dataset():
     return X_Dataset_train, Y_Dataset_train, X_Dataset_test, Y_Dataset_test, classes
 
 
-def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
+def random_mini_batches(X, Y, mini_batch_size = 70, seed = 0):
     """
     Creates a list of random minibatches from (X, Y)
     
@@ -89,7 +97,7 @@ def predict(X, parameters):
               "W3": W3,
               "b3": b3}
     
-    x = tf.placeholder("float", [12288, 1])
+    x = tf.placeholder("float", [30000, 1])
     
     z3 = forward_propagation_for_predict(x, params)
     p = tf.argmax(z3)
