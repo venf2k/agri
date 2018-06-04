@@ -2,10 +2,10 @@
 #
 # M A I N
 #
-# DIR = /media/user/_home1/apps/python/DL/Agri
-#
-################################################################################
+# ################################################################################
 
+#cd  /media/user/_home1/apps/python/DL/Agri
+#cd  D:/Apps/Python/DL/Agri
 import math
 import numpy as np
 import h5py
@@ -27,6 +27,18 @@ Y_test = Y_test_orig[0]
 X_train = X_train / 255.
 X_test = X_test / 255.
 
-
+# FIT Model
 svm=LinearSVC()
 svm.fit(X_train, Y_train)
+
+#PREDICT test set
+test_label=svm.predict(X_test)
+
+
+j = 0 
+for i in range(Y_test.size):
+  if test_label[i] == Y_test[i]: 
+    j += 1
+
+acc = j / i
+print("Accurance: ", acc)
